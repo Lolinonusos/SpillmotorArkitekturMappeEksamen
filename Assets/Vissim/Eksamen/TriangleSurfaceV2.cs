@@ -1,9 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using UnityEditor.ShaderGraph.Legacy;
+
 
 public struct Triangle {
     public int ID;
@@ -39,7 +37,7 @@ public struct Triangle {
 
 public class TriangleSurfaceV2 : MonoBehaviour
 {
-    [SerializeField] private string pointFilePath;
+    [SerializeField] private string pointFileName;
     private Vector3[] points;
 
     private float xAvg;
@@ -68,6 +66,7 @@ public class TriangleSurfaceV2 : MonoBehaviour
 
     List<int> unModifiedVerts = new List<int>();
 
+    public MeshCollider meshCollider;
     
     void Start() {
         mesh = new Mesh();
@@ -80,8 +79,12 @@ public class TriangleSurfaceV2 : MonoBehaviour
             
         float zMin = float.MaxValue;
         float zMax = float.MinValue;
-            
-        StreamReader sr = new StreamReader(pointFilePath);
+
+        //Path.Combine(Application.streamingAssetsPath
+        string filePath = Path.Combine(Application.streamingAssetsPath, pointFileName);
+        Debug.Log(filePath);
+        
+        StreamReader sr = new StreamReader(filePath);
 
         int lineCount = int.Parse(sr.ReadLine());
         points = new Vector3[lineCount]; // Give correct array size
@@ -122,7 +125,7 @@ public class TriangleSurfaceV2 : MonoBehaviour
             counter++;
         }
 
-        print("Total amount of points read from file: " + points.Length);
+        //print("Total amount of points read from file: " + points.Length);
 
         // Sentrer punkter til origo
         xAvg = 0.5f * (xMin + xMax);
@@ -160,8 +163,8 @@ public class TriangleSurfaceV2 : MonoBehaviour
             if (zMin > z) { zMin = z; }
         }
 
-        print("Max positions: " + new Vector3(xMax, yMax, zMax));
-        print("Min positions: " + new Vector3(xMin, yMin, zMin));
+        //print("Max positions: " + new Vector3(xMax, yMax, zMax));
+        //print("Min positions: " + new Vector3(xMin, yMin, zMin));
         
         // ############################################
         // SETTING UP VERTICES, INDICES AND NEIGHBOURS
@@ -179,7 +182,7 @@ public class TriangleSurfaceV2 : MonoBehaviour
         min = - max;
         size = max - min;
         stepLength = size / resolution;
-        print("stepLength: " + stepLength);
+        //print("stepLength: " + stepLength);
         //float hSize = size / 2.0f;
         
         for (int z = 0; z < resolution + 1; z++) {
@@ -278,6 +281,7 @@ public class TriangleSurfaceV2 : MonoBehaviour
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
         GetComponent<MeshFilter>().mesh = mesh;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     // Definerer et kvadratisk område rundt et midtpunkt og skjekker for punkter innenfor kvadratet
@@ -291,11 +295,11 @@ public class TriangleSurfaceV2 : MonoBehaviour
         Vector3 bottomLeft = new Vector3(point.x - size, 0.0f,point.z - size);
         Vector3 bottomRight = new Vector3(point.x + size, 0.0f, point.z - size);
 
-        print("Vertex Pos: " + point.x + ", " + point.z);
-        print("TopLeft Pos: " + topLeft.x + ", " + topLeft.z);
-        print("TopRight Pos: " + topRight.x + ", " + topRight.z);
-        print("BottomLeft Pos: " + bottomLeft.x + ", " + bottomLeft.z);
-        print("BottomRight Pos: " + bottomRight.x + ", " + bottomRight.z);
+        //print("Vertex Pos: " + point.x + ", " + point.z);
+        //print("TopLeft Pos: " + topLeft.x + ", " + topLeft.z);
+        //print("TopRight Pos: " + topRight.x + ", " + topRight.z);
+        //print("BottomLeft Pos: " + bottomLeft.x + ", " + bottomLeft.z);
+        //print("BottomRight Pos: " + bottomRight.x + ", " + bottomRight.z);
         
         
         for (int i = 0; i < points.Length; i += skip) {

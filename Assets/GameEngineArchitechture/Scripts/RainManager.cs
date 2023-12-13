@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -8,6 +5,9 @@ public class RainManager : MonoBehaviour {
     [SerializeField] GameObject rainDropPrefab;
     [SerializeField] Vector2 spawnArea = Vector2.one * 10;
 
+    [SerializeField] private float lifeTime = 120f; // Seconds
+    [SerializeField] private float spawnRate = 12f; // Seconds 
+    
     Vector3 GetRandomRainPosition() {
         float x = Random.Range(-spawnArea.x, spawnArea.x);
         float z = Random.Range(-spawnArea.y, spawnArea.y);
@@ -20,7 +20,9 @@ public class RainManager : MonoBehaviour {
 
     void spawnRain() {
         GameObject rainDropGameObject = Instantiate(rainDropPrefab, GetRandomRainPosition(), Quaternion.identity);
-        Destroy(rainDropGameObject, 60f);
+        float randomScale = Random.Range(1f, 5f);
+        rainDropGameObject.transform.localScale = new Vector3(randomScale, randomScale, randomScale);
+        Destroy(rainDropGameObject, lifeTime);
     }
 
     void OnDrawGizmosSelected() {
@@ -30,12 +32,7 @@ public class RainManager : MonoBehaviour {
     }
 
     void Start() {
-        InvokeRepeating("spawnRain", 0.0f, 0.2f);
+        InvokeRepeating("spawnRain", 0.0f, spawnRate);
         spawnRain();
-    }
-
-    // Update is called once per frame
-    void FixedUpdate() {
-        //float time = Time.deltaTime;
     }
 }
